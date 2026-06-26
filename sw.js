@@ -1,4 +1,4 @@
-const CACHE = 'stickersprint-v1';
+const CACHE = 'stickersprint-v3';
 const ASSETS = [
   './StickerSprint-2026.html',
   './manifest.json',
