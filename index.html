@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>StickerSprint 2026 — Road to FIFA World Cup</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StickerSprint">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#0b1020; --panel:#141b30; --panel2:#1b2440; --line:#2a3550;
+    --txt:#eaf0ff; --muted:#93a0c0; --gold:#ffcb45; --green:#2ec26b; --red:#ff5a6a;
+    --blue:#3d7bff; --chip:#202b4a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(180deg,#0b1020,#0d1428);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 14px 90px}
+  header{position:sticky;top:0;z-index:30;background:rgba(11,16,32,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line)}
+  .hbar{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px}
+  .logo{font-weight:800;letter-spacing:.3px;font-size:18px}
+  .logo b{color:var(--gold)}
+  .spacer{flex:1}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;
+    padding:7px 11px;font-size:13px;cursor:pointer}
+  .btn:hover{border-color:var(--blue)}
+  .btn.primary{background:var(--blue);border-color:var(--blue)}
+  nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 14px 10px;max-width:1100px;margin:0 auto}
+  nav.tabs button{white-space:nowrap;background:transparent;border:1px solid var(--line);color:var(--muted);
+    padding:7px 13px;border-radius:999px;cursor:pointer;font-size:13px}
+  nav.tabs button.active{background:var(--gold);color:#21160a;border-color:var(--gold);font-weight:700}
+
+  /* dashboard */
+  .hero{display:flex;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:18px;margin:16px 0}
+  .ring{--p:0;width:120px;height:120px;border-radius:50%;flex:0 0 auto;
+    background:radial-gradient(closest-side,var(--panel) 78%,transparent 79% 100%),
+      conic-gradient(var(--gold) calc(var(--p)*1%),#2a3550 0);display:grid;place-items:center}
+  .ring b{font-size:26px}.ring span{display:block;font-size:11px;color:var(--muted);text-align:center}
+  .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex:1}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer}
+  .card:hover{border-color:var(--blue)}
+  .card .n{font-size:24px;font-weight:800}
+  .card .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .card.green .n{color:var(--green)} .card.red .n{color:var(--red)}
+  .card.gold .n{color:var(--gold)} .card.blue .n{color:var(--blue)}
+
+  .group{margin:14px 0}
+  .group h3{margin:0 0 8px;font-size:13px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+  .teamrow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:9px 12px;margin-bottom:7px;cursor:pointer}
+  .teamrow:hover{border-color:var(--blue)}
+  .teamrow img.fl{width:30px;height:20px;object-fit:cover;border-radius:3px;background:#222;flex:0 0 auto}
+  .teamrow .nm{font-weight:600;flex:1}
+  .teamrow .ct{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .mini{width:90px;height:7px;border-radius:99px;background:#26314f;overflow:hidden;flex:0 0 auto}
+  .mini i{display:block;height:100%;background:var(--gold)}
+  .grid-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+
+  /* album */
+  .albhead{display:flex;align-items:center;gap:14px;margin:16px 0}
+  .albhead img.fl{width:56px;height:38px;object-fit:cover;border-radius:5px}
+  .albhead h2{margin:0;font-size:22px}
+  .albhead .sub{color:var(--muted);font-size:13px}
+  .page{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .row{display:flex;gap:10px;margin-bottom:10px;justify-content:center}
+  .slot{position:relative;flex:1 1 0;min-width:0;aspect-ratio:3/4;border-radius:12px;overflow:hidden;
+    border:2px solid #33405f;background:#10182e;cursor:pointer;user-select:none}
+  .slot.wide{flex:2 1 0;aspect-ratio:auto}
+  .slot .fbg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.18}
+  .slot.own .fbg{opacity:.85}
+  .slot .ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;
+    padding:6px;background:linear-gradient(180deg,rgba(8,12,24,.35),rgba(8,12,24,.78))}
+  .slot.own{border-color:var(--gold);box-shadow:0 0 0 1px rgba(255,203,69,.35),0 6px 16px rgba(0,0,0,.35)}
+  .slot.own .ov{background:linear-gradient(180deg,rgba(8,12,24,.15),rgba(8,12,24,.55))}
+  .slot:not(.own){border-style:dashed;border-color:#42506f}
+  .slot:not(.own) .fbg{filter:grayscale(.7)}
+  .slot .top{display:flex;justify-content:space-between;align-items:center;gap:4px}
+  .slot .num{font-weight:800;font-size:13px;background:rgba(0,0,0,.45);border-radius:6px;padding:1px 6px}
+  .slot.own .num{background:var(--gold);color:#21160a}
+  .slot .icon{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;opacity:.9}
+  .slot .icon svg{width:58%;height:auto;max-height:80%;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+  .slot.wide .icon svg{width:60%;max-height:74%}
+  .slot.own .icon{opacity:.5}
+  .slot .nm{font-size:11px;line-height:1.15;font-weight:600;text-shadow:0 1px 2px #000;
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .slot .tools{position:absolute;top:4px;right:4px;display:flex;gap:3px;opacity:0;transition:.15s}
+  .slot:hover .tools{opacity:1}
+  .slot .tbtn{width:20px;height:20px;border-radius:6px;border:none;background:rgba(0,0,0,.55);color:#fff;
+    font-size:12px;line-height:1;cursor:pointer;display:grid;place-items:center}
+  .dupbadge{position:absolute;bottom:4px;right:4px;background:var(--blue);color:#fff;font-size:10px;
+    font-weight:700;border-radius:99px;padding:1px 6px}
+  .verifyflag{position:absolute;bottom:4px;left:4px;background:var(--red);color:#fff;font-size:9px;
+    font-weight:700;border-radius:99px;padding:1px 5px}
+
+  /* lists */
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0}
+  .toolbar input,.toolbar select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:8px 10px;font-size:14px}
+  .toolbar input[type=text]{flex:1;min-width:160px}
+  .lrow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);
+    border-radius:11px;padding:8px 11px;margin-bottom:7px}
+  .lrow img.fl{width:26px;height:17px;object-fit:cover;border-radius:3px;flex:0 0 auto}
+  .lrow .code{font-weight:700;font-size:12px;color:var(--gold);width:64px;flex:0 0 auto}
+  .lrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lrow .tm{font-size:12px;color:var(--muted);flex:0 0 auto}
+  .step{display:flex;align-items:center;gap:6px}
+  .step button{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);
+    color:#fff;cursor:pointer}
+  .check{width:22px;height:22px;cursor:pointer;accent-color:var(--green)}
+  .empty{color:var(--muted);text-align:center;padding:30px;border:1px dashed var(--line);border-radius:14px}
+  .hint{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--blue);
+    border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);margin-bottom:12px}
+
+  /* matches */
+  .mform{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;background:var(--panel);
+    border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+  .mrow{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:10px;margin-bottom:8px}
+  .mrow img.fl{width:34px;height:23px;object-fit:cover;border-radius:4px}
+  .mrow .side{flex:1;display:flex;align-items:center;gap:8px}
+  .mrow .side.away{flex-direction:row-reverse;text-align:right}
+  .mrow .sc{width:42px;text-align:center;font-weight:800;font-size:18px;background:var(--panel2);
+    border:1px solid var(--line);color:#fff;border-radius:8px;padding:5px}
+  .mrow .meta{font-size:11px;color:var(--muted);width:100%}
+  label.fld{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+  select.full,input.full{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:8px}
+  .center{text-align:center}
+  .mhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+  .vtoggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .vtoggle button{background:transparent;color:var(--muted);border:none;padding:7px 14px;cursor:pointer;font-size:13px}
+  .vtoggle button.on{background:var(--blue);color:#fff;font-weight:700}
+  .datehdr{margin:16px 0 8px;font-size:13px;color:var(--gold);font-weight:800;letter-spacing:.03em}
+  .grphdr{margin:18px 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+  .mdhdr{margin:10px 0 5px;font-size:11px;color:var(--muted)}
+  .upc{color:var(--muted);font-size:11px;font-style:italic}
+  .flaggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;background:var(--panel);
+    border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+  .fgcell{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:1px solid var(--line);
+    border-radius:10px;cursor:pointer;background:var(--panel2);font-size:11px;text-align:center}
+  .fgcell:hover{border-color:var(--blue)}
+  .fgcell.home{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+  .fgcell img{width:44px;height:29px;object-fit:cover;border-radius:4px}
+  .fgpick{font-size:13px;color:var(--muted);margin-bottom:8px}
+  /* specials */
+  .sdots{display:inline-flex;gap:2px;margin-left:4px;vertical-align:middle}
+  .sdots i{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
+  .spcount{font-size:11px;font-weight:700;color:var(--gold);background:rgba(255,203,69,.12);border:1px solid rgba(255,203,69,.4);border-radius:99px;padding:1px 7px;flex:0 0 auto}
+  .mback{position:fixed;inset:0;background:rgba(4,7,16,.72);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .mcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;max-width:420px;width:100%}
+  .mch{font-size:15px} .mch .btn{float:right}
+  .mcs{font-size:13px;color:var(--muted);margin:10px 0 12px;clear:both}
+  .tierchips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tierchip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer;color:var(--txt);font-size:13px}
+  .tierchip small{margin-left:auto;color:var(--muted)}
+  .tierchip.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .tierchip .sw,.trow .sw{width:16px;height:16px;border-radius:4px;flex:0 0 auto;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+  .legend{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin-bottom:14px}
+  .trow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .trow:last-child{border-bottom:none}
+  .trow-h{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .trow .tl{flex:1;font-weight:600} .trow-h .tl{font-weight:400}
+  .trow .oddsh{width:120px;text-align:right}
+  .oddsin{width:120px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:5px 8px;font-size:13px;text-align:right}
+  .trow .tct{width:48px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:2px;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+  .tiercounts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tcchip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:13px;color:var(--muted)}
+  .tcchip i{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+  .tcchip b{color:var(--txt);font-variant-numeric:tabular-nums}
+  /* finance */
+  .stat-cards.fin{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:0 0 14px}
+  .secpage{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+  .secpage .slot.wide{grid-column:span 2;aspect-ratio:auto;min-height:118px}
+  .fbg.nofl{background:linear-gradient(135deg,#1b2440,#2a3550);opacity:.55}
+  .winflag{position:absolute;bottom:6px;right:6px;width:34px;height:23px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 2px 6px rgba(0,0,0,.55);z-index:2}
+  .secico{width:44px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid var(--line);border-radius:5px;flex:0 0 auto}
+  .secico svg{width:20px;height:20px}
+  .teamrow .secico{width:30px;height:20px}
+  .prow[data-editp]{cursor:pointer}
+  .prow[data-editp]:hover{border-color:var(--blue)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#06210f;font-weight:700;padding:9px 16px;border-radius:99px;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,.4);font-size:13px}
+  .jstrip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch}
+  .jflag{flex:0 0 auto;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:3px;cursor:pointer;line-height:0}
+  .jflag img{width:34px;height:23px;object-fit:cover;border-radius:3px;display:block}
+  .jflag .jstar{display:inline-flex;width:34px;height:23px;align-items:center;justify-content:center}
+  .jflag .jstar svg{width:15px;height:15px}
+  .jflag.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .albgrid{position:relative}
+  .navarrow{position:absolute;top:50%;transform:translateY(-50%);z-index:20;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(13,20,40,.86);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .navarrow.prev{left:-8px} .navarrow.next{right:-8px}
+  .navarrow:hover{border-color:var(--blue);background:var(--blue)}
+  .teamrow.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  @media(max-width:640px){ .navarrow{width:32px;height:32px;font-size:18px} .navarrow.prev{left:-2px} .navarrow.next{right:-2px} }
+  .finform{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .chart{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .chart h4{margin:0 0 6px;font-size:13px;color:var(--muted)}
+  .bars{display:flex;gap:6px;align-items:flex-end;height:140px;overflow-x:auto}
+  .bar{flex:0 0 36px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
+  .bar i{width:22px;background:var(--gold);border-radius:4px 4px 0 0;min-height:2px;display:block}
+  .bar i.grn{background:var(--green)}
+  .bar b{font-size:10px;color:var(--muted)} .bar span{font-size:10px;color:var(--muted)}
+  .prow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 11px;margin-bottom:7px;flex-wrap:wrap}
+  .prow .pdate{font-size:12px;color:var(--muted);width:84px;flex:0 0 auto}
+  .prow .pwhat{flex:1;min-width:120px;font-weight:600}
+  .prow .pwhat small{color:var(--muted);font-weight:400}
+  .prow .pcost{font-weight:800;width:72px;text-align:right}
+  .prow .pnd{font-size:12px;color:var(--muted)}
+  @media(max-width:640px){
+    .stat-cards.fin{grid-template-columns:repeat(2,1fr)}
+    .finform{grid-template-columns:1fr 1fr}
+    .charts{grid-template-columns:1fr}
+    .tierchips{grid-template-columns:1fr}
+    .stat-cards{grid-template-columns:repeat(2,1fr)}
+    .hero{flex-direction:column;align-items:stretch}
+    .grid-groups{grid-template-columns:1fr}
+    .mform{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="logo">Sticker<b>Sprint</b> 2026</div>
+    <div class="spacer"></div>
+    <button class="btn" id="exportBtn">Export</button>
+    <button class="btn" id="importBtn">Import</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<div class="wrap" id="view"></div>
+<div id="modal"></div>
+
+<script src="data.js"></script>
+<script>
+const SAVE_KEY = 'rtwc26_v1';
+const D = window.ALBUM_DATA;
+const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+const TIERS = [
+  {key:'white',label:'White',color:'#e9edf6',odds:'base'},
+  {key:'blue',label:'Blue',color:'#3d7bff',odds:'1:2'},
+  {key:'red',label:'Red',color:'#ff5a6a',odds:'1:25'},
+  {key:'purple',label:'Purple',color:'#a06bff',odds:'1:200'},
+  {key:'green',label:'Green',color:'#2ec26b',odds:'1:1,400'},
+  {key:'black',label:'Black',color:'#15151c',odds:'1/1'}
+];
+const tierByKey={}; TIERS.forEach(t=>tierByKey[t.key]=t);
+const oddsOf = k => (S.tierOdds && S.tierOdds[k]!=null && S.tierOdds[k]!=='') ? S.tierOdds[k] : (tierByKey[k]?tierByKey[k].odds:'');
+const teamByCode = {}; D.teams.forEach(t=>teamByCode[t.code]=t);
+const flag = iso => `https://flagcdn.com/w320/${iso}.png`;
+
+// ---- state ----
+let S = load();
+function load(){
+  let base = { ov:{}, dup:{}, nm:{}, ver:{}, matches:[], mid:1, seeded:false, spec:{}, tierOdds:{}, purchases:[], pid:1 };
+  D.stickers.forEach(s=>{ base.ov[s.code]=s.owned; });
+  try{
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(saved){
+      base.ov = Object.assign(base.ov, saved.ov||{});
+      base.dup = saved.dup||{}; base.nm = saved.nm||{}; base.ver = saved.ver||{};
+      base.matches = saved.matches||[]; base.mid = saved.mid||1; base.seeded = !!saved.seeded;
+      base.spec = saved.spec||{}; base.tierOdds = saved.tierOdds||{}; base.purchases = saved.purchases||[]; base.pid = saved.pid||1;
+    }
+  }catch(e){}
+  return base;
+}
+function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
+function seedFixtures(){
+  if(!D.fixtures || !D.fixtures.length || S.seeded) return;
+  D.fixtures.forEach(f=>{ S.matches.push({ id:S.mid++, home:f.home, away:f.away,
+    hs:(f.hs==null?'':f.hs), as:(f.as==null?'':f.as), date:f.date||'', group:f.group,
+    matchday:f.matchday, stage:'Group '+f.group, kind:'official', played:!!f.played }); });
+  S.seeded = true; save();
+}
+function reseedFixtures(){ S.matches = S.matches.filter(m=>m.kind!=='official'); S.seeded=false; seedFixtures(); }
+seedFixtures();
+
+// effective getters
+const isOwned = c => !!S.ov[c];
+const dupOf = c => S.dup[c]||0;
+const nameOf = (c,base) => (S.nm[c]!==undefined? S.nm[c] : base);
+const isVerified = c => !!S.ver[c];
+const stk = () => D.stickers.map(s=>({...s, name:nameOf(s.code,s.name), owned:isOwned(s.code),
+   dup:dupOf(s.code), verified:isVerified(s.code)}));
+
+function setOwned(c,v){ S.ov[c]=v; save(); }
+function setDup(c,v){ v=Math.max(0,v); if(v) S.dup[c]=v; else delete S.dup[c]; save(); }
+function setName(c,v){ S.nm[c]=v; save(); }
+function setVerified(c){ S.ver[c]=true; save(); }
+// specials (parallels, collection-level)
+const specOf = c => S.spec[c]||[];
+function toggleSpec(c,tier){ var a=(S.spec[c]||[]).slice(); var i=a.indexOf(tier); if(i>=0)a.splice(i,1); else a.push(tier); if(a.length)S.spec[c]=a; else delete S.spec[c]; save(); }
+function rarestTier(c){ var a=specOf(c); for(var i=TIERS.length-1;i>=0;i--){ if(a.indexOf(TIERS[i].key)>=0) return TIERS[i]; } return null; }
+function teamSpecCount(code){ return D.stickers.filter(s=>s.t===code).reduce((n,s)=>n+specOf(s.code).length,0); }
+function setTierOdds(k,v){ if(v===''||v===tierByKey[k].odds) delete S.tierOdds[k]; else S.tierOdds[k]=v; save(); }
+// purchases
+function packetsOf(type){ return type==='box50'?50:type==='box25'?25:type==='packet'?1:0; }
+function purchaseStickers(p){ if(p.type==='custom') return Math.max(0,parseInt(p.stickers)||0); return (parseInt(p.qty)||0)*packetsOf(p.type)*7; }
+function purchaseCost(p){ var q=parseFloat(p.qty); if(!q||q<1)q=1; return q*(parseFloat(p.unit)||0); }
+
+// stats
+function stats(){
+  const all = stk();
+  const owned = all.filter(s=>s.owned).length;
+  const total = all.length;
+  const dupes = all.reduce((a,s)=>a+s.dup,0);
+  const verify = all.filter(s=>s.conf==='low' && !s.verified).length;
+  return {owned,total,missing:total-owned,dupes,verify,pct:total?owned/total*100:0};
+}
+function teamStats(code){
+  const a = stk().filter(s=>s.t===code);
+  return {owned:a.filter(s=>s.owned).length,total:a.length};
+}
+
+// ---- icons ----
+const IC = {
+  person:'<svg viewBox="0 0 64 74"><circle cx="32" cy="22" r="15" fill="#fff"/><path d="M5 74 C5 52 16 44 32 44 C48 44 59 52 59 74 Z" fill="#fff"/></svg>',
+  shield:'<svg viewBox="0 0 64 74"><path d="M32 4 L58 13 V37 C58 55 46 66 32 71 C18 66 6 55 6 37 V13 Z" fill="#fff"/><path d="M32 12 L50 18 V36 C50 48 42 56 32 60 C22 56 14 48 14 36 V18 Z" fill="none" stroke="#0d1428" stroke-width="2" opacity=".25"/></svg>',
+  photo:'<svg viewBox="0 0 104 64"><g fill="#fff" stroke="#0d1428" stroke-width="2"><circle cx="20" cy="28" r="9"/><path d="M4 64 C4 47 11 42 20 42 C29 42 36 47 36 64 Z"/><circle cx="84" cy="28" r="9"/><path d="M68 64 C68 47 75 42 84 42 C93 42 100 47 100 64 Z"/><circle cx="52" cy="17" r="12"/><path d="M30 64 C30 41 40 35 52 35 C64 35 74 41 74 64 Z"/></g></svg>'
+};
+IC.star='<svg viewBox="0 0 64 74"><path d="M32 6 L40 27 L62 28 L45 42 L51 70 L32 55 L13 70 L19 42 L2 28 L24 27 Z" fill="#fff"/></svg>';
+
+// ---- router ----
+let cur = {view:'dash', team:null};
+const TABS = [['dash','Dashboard'],['missing','Missing'],['swaps','Swaps'],['verify','To verify'],['specials','Specials'],['finance','Spending'],['search','Search'],['matches','Matches']];
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = TABS.map(([k,l])=>
+    `<button data-k="${k}" class="${cur.view===k?'active':''}">${l}</button>`).join('');
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.k));
+}
+function go(view,team){ cur={view,team:team||null}; renderTabs(); render(); window.scrollTo(0,0); }
+
+function render(){
+  const v=document.getElementById('view');
+  if(cur.view==='dash') v.innerHTML=viewDash();
+  else if(cur.view==='album') v.innerHTML=viewAlbum(cur.team);
+  else if(cur.view==='missing') v.innerHTML=viewList('missing');
+  else if(cur.view==='owned') v.innerHTML=viewList('owned');
+  else if(cur.view==='swaps') v.innerHTML=viewSwaps();
+  else if(cur.view==='verify') v.innerHTML=viewVerify();
+  else if(cur.view==='search') v.innerHTML=viewSearch();
+  else if(cur.view==='matches') v.innerHTML=viewMatches();
+  else if(cur.view==='specials') v.innerHTML=viewSpecials();
+  else if(cur.view==='finance') v.innerHTML=viewFinance();
+  renderModal();
+  wire();
+  if(cur.view==='album'){
+    setTimeout(()=>{
+      const strip=document.querySelector('.jstrip');
+      const cur=document.querySelector('.jflag.cur');
+      if(strip&&cur){
+        const stripW=strip.offsetWidth, curL=cur.offsetLeft, curW=cur.offsetWidth;
+        strip.scrollLeft = Math.max(0, curL - stripW/2 + curW/2);
+      }
+    }, 0);
+  }
+}
+
+// ---- dashboard ----
+function viewDash(){
+  const s=stats();
+  let groups='', top='';
+  const ordered=D.teams.slice().sort((a,b)=>(a.ord||0)-(b.ord||0));
+  const seen=[]; ordered.forEach(t=>{ if(seen.indexOf(t.group)<0) seen.push(t.group); });
+  seen.forEach(g=>{
+    const teams=ordered.filter(t=>t.group===g);
+    const special = teams.length && teams[0].special;
+    const label = g==='FWC'?'World Cup':g==='CC'?'Coca-Cola':'Group '+g;
+    const block=`<div class="group"><h3>${label}</h3>`+teams.map(t=>{
+      const ts=teamStats(t.code), p=ts.total?Math.round(ts.owned/ts.total*100):0, sc=teamSpecCount(t.code);
+      const ico = t.iso2 ? `<img class="fl" loading="lazy" src="${flag(t.iso2)}" alt="">` : `<div class="fl secico">${IC.star}</div>`;
+      return `<div class="teamrow" data-team="${t.code}">
+        ${ico}
+        <div class="nm">${t.name}</div>
+        ${sc?`<span class="spcount" title="special parallels owned">✦${sc}</span>`:''}
+        <div class="mini"><i style="width:${p}%"></i></div>
+        <div class="ct">${ts.owned}/${ts.total}</div></div>`;
+    }).join('')+`</div>`;
+    if(special) top+=block; else groups+=block;
+  });
+  return `
+  <div class="hero">
+    <div class="ring" style="--p:${s.pct.toFixed(1)}"><div><b>${s.pct.toFixed(1)}%</b><span>complete</span></div></div>
+    <div class="stat-cards">
+      <div class="card green" data-go="owned"><div class="n">${s.owned}</div><div class="l">Owned</div></div>
+      <div class="card red" data-go="missing"><div class="n">${s.missing}</div><div class="l">Missing</div></div>
+      <div class="card blue" data-go="swaps"><div class="n">${s.dupes}</div><div class="l">Duplicates</div></div>
+      <div class="card gold" data-go="verify"><div class="n">${s.verify}</div><div class="l">To verify</div></div>
+    </div>
+  </div>
+  ${top?`<div class="grid-groups top-sections">${top}</div>`:''}
+  <div class="grid-groups">${groups}</div>`;
+}
+
+// ---- album (one team) ----
+const ROWS=[[1,2],[3,4,5,6],[7,8,9,10],[11,12,13],[14,15,16,17],[18,19,20]];
+function slotHtml(s,t){
+  const wide = t.special ? (s.orient==='h') : (s.n===13);
+  const isWinner = t.special && s.host && s.win;
+  const icon = t.special ? (isWinner?IC.photo:IC.star) : (s.n===1?IC.shield : s.n===13?IC.photo : IC.person);
+  const sp = specOf(s.code), rare = rarestTier(s.code);
+  const dots = sp.length? `<span class="sdots">`+TIERS.filter(T=>sp.indexOf(T.key)>=0).map(T=>`<i style="background:${T.color}"></i>`).join('')+`</span>` : '';
+  const ringTier = rare || (s.owned ? TIERS[0] : null);
+  const ring = ringTier? ` style="border-color:${ringTier.color};box-shadow:0 0 0 2px ${ringTier.color}55, 0 6px 16px rgba(0,0,0,.4)"` : '';
+  const fbg = isWinner ? `<div class="fbg" style="background-image:url('${flag(s.host)}')"></div>`
+            : (t.iso2 ? `<div class="fbg" style="background-image:url('${flag(t.iso2)}')"></div>` : `<div class="fbg nofl"></div>`);
+  const numLabel = t.special ? s.code : s.n;
+  return `<div class="slot ${s.owned?'own':''} ${wide?'wide':''}" data-code="${s.code}"${ring}>
+    ${fbg}
+    ${(isWinner&&s.owned)?`<img class="winflag" src="${flag(s.win)}" alt="">`:''}
+    <div class="ov">
+      <div class="top"><span class="num">${numLabel}</span>${dots}</div>
+      <div class="icon">${icon}</div>
+      <div class="nm">${s.name||''}</div>
+    </div>
+    <div class="tools">
+      <button class="tbtn" data-act="spec" title="special borders">✦</button>
+      ${s.owned?`<button class="tbtn" data-act="dminus" title="one less spare">–</button>
+                 <button class="tbtn" data-act="dplus" title="add a spare">+</button>`:''}
+      <button class="tbtn" data-act="edit" title="edit name">✎</button>
+    </div>
+    ${s.dup?`<span class="dupbadge">×${s.dup} spare</span>`:''}
+    ${(s.conf==='low'&&!s.verified)?`<span class="verifyflag">verify</span>`:''}
+  </div>`;
+}
+function viewAlbum(code){
+  const t=teamByCode[code]; const list=stk().filter(s=>s.t===code).sort((a,b)=>a.n-b.n);
+  const ts=teamStats(code), p=ts.total?Math.round(ts.owned/ts.total*100):0, sc=teamSpecCount(code);
+  let body;
+  if(t.special){
+    body=`<div class="page secpage">${list.map(s=>slotHtml(s,t)).join('')}</div>`;
+  } else {
+    const by={}; list.forEach(s=>by[s.n]=s);
+    body=`<div class="page">${ROWS.map(r=>`<div class="row">${r.map(n=>by[n]?slotHtml(by[n],t):'').join('')}</div>`).join('')}</div>`;
+  }
+  const head = t.iso2 ? `<img class="fl" src="${flag(t.iso2)}" alt="">` : `<div class="secico">${IC.star}</div>`;
+  const sub = (t.special?'':`Group ${t.group} · `)+`${ts.owned}/${ts.total} owned (${p}%)${sc?` · ✦${sc} specials`:''}`;
+  const seq=D.teams.slice().sort((a,b)=>(a.ord||0)-(b.ord||0));
+  const idx=seq.findIndex(x=>x.code===code), prev=seq[(idx-1+seq.length)%seq.length], next=seq[(idx+1)%seq.length];
+  const strip=seq.map(x=>`<button class="jflag ${x.code===code?'cur':''}" data-go-team="${x.code}" title="${x.name}">${x.iso2?`<img loading="lazy" src="${flag(x.iso2)}">`:`<span class="jstar">${IC.star}</span>`}</button>`).join('');
+  let extra='';
+  if(!t.special){
+    const gt=D.teams.filter(x=>x.group===t.group&&!x.special).sort((a,b)=>(a.ord||0)-(b.ord||0));
+    const grows=gt.map(x=>{ const xs=teamStats(x.code), xp=xs.total?Math.round(xs.owned/xs.total*100):0;
+      return `<div class="teamrow ${x.code===code?'cur':''}" data-go-team="${x.code}"><img class="fl" loading="lazy" src="${flag(x.iso2)}"><div class="nm">${x.name}</div><div class="mini"><i style="width:${xp}%"></i></div><div class="ct">${xs.owned}/${xs.total}</div></div>`; }).join('');
+    const ms=S.matches.filter(m=>m.home===code||m.away===code).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const mhtml=ms.length? ms.map(mrow).join('') : `<div class="empty">No matches involving ${t.name} yet — add them in the Matches tab.</div>`;
+    extra=`<h3 class="grphdr">Group ${t.group}</h3>${grows}<h3 class="grphdr">${t.name} — matches</h3>${mhtml}`;
+  }
+  return `<div class="albhead">
+      <button class="btn" data-go="dash">‹ All teams</button>
+      ${head}
+      <div><h2>${t.name}</h2><div class="sub">${sub}</div></div>
+    </div>
+    <div class="jstrip">${strip}</div>
+    <div class="albgrid">
+      <button class="navarrow prev" data-go-team="${prev.code}" title="${prev.name}">‹</button>
+      ${body}
+      <button class="navarrow next" data-go-team="${next.code}" title="${next.name}">›</button>
+    </div>
+    <div class="hint">Tap a sticker to mark it owned/missing. ‹ › jump to the previous/next team, or tap a flag above. Below: your group and this team's matches.</div>
+    ${extra}`;
+}
+
+// ---- generic list (missing / owned) ----
+function viewList(mode){
+  const teamSel = listTeamFilter(mode);
+  const fcode = window.__filter||'';
+  let list = stk().filter(s=> mode==='owned'? s.owned : !s.owned);
+  if(fcode) list=list.filter(s=>s.t===fcode);
+  list.sort((a,b)=> a.t===b.t? a.n-b.n : a.t.localeCompare(b.t));
+  const title = mode==='owned'?'Owned stickers':'Missing stickers';
+  let body = list.length? list.map(s=>{
+    const t=teamByCode[s.t];
+    return `<div class="lrow">
+      <img class="fl" loading="lazy" src="${flag(t.iso2)}">
+      <span class="code">${s.code}</span>
+      <span class="nm">${s.name||'<i style=opacity:.5>(no name)</i>'}</span>
+      ${fcode?'':`<span class="tm">${t.name}</span>`}
+      <input type="checkbox" class="check" data-code="${s.code}" ${s.owned?'checked':''}>
+    </div>`;
+  }).join('') : `<div class="empty">${mode==='owned'?'No stickers owned yet.':'Nothing missing here — nice!'}</div>`;
+  return `<h2>${title} <span style="color:var(--muted);font-size:14px">(${list.length})</span></h2>
+    ${mode==='missing'?'<div class="hint">Tick a sticker to mark it owned — it updates your album instantly.</div>':''}
+    <div class="toolbar">${teamSel}${list.length?`<button class="btn" id="listTxt">📋 Copy</button><button class="btn" id="listPdf">📄 PDF</button>`:''}</div>${body}`;
+}
+function listTeamFilter(mode){
+  const opts=['<option value="">All teams</option>'].concat(
+    D.teams.slice().sort((a,b)=>a.name.localeCompare(b.name))
+     .map(t=>`<option value="${t.code}" ${window.__filter===t.code?'selected':''}>${t.name}</option>`));
+  return `<select id="teamFilter">${opts.join('')}</select>`;
+}
+
+// ---- swaps ----
+function viewSwaps(){
+  const list=stk().filter(s=>s.dup>0).sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  const totalSpares=list.reduce((n,s)=>n+s.dup,0);
+  let body = list.length? list.map(s=>{const t=teamByCode[s.t];
+    return `<div class="lrow"><img class="fl" src="${flag(t.iso2)}"><span class="code">${s.code}</span>
+      <span class="nm">${s.name||''}</span><span class="tm">${t.name}</span>
+      <span class="step"><button data-code="${s.code}" data-act="dminus">–</button>
+      <b>×${s.dup}</b><button data-code="${s.code}" data-act="dplus">+</button></span></div>`;
+  }).join('') : `<div class="empty">No spares yet. On any sticker you own (team page or the lists), use <b>+</b> to record an extra copy you can trade.</div>`;
+  return `<h2>Swaps <span style="color:var(--muted);font-size:14px">(${totalSpares} spare${totalSpares===1?'':'s'} · ${list.length} sticker${list.length===1?'':'s'})</span>${list.length?`<span style="float:right;display:inline-flex;gap:6px"><button class="btn" id="swapTxt">📋 Copy</button><button class="btn" id="swapPdf">📄 PDF</button></span>`:''}</h2>
+    <div class="hint">Extra copies you own and can trade. Set a spare count with +/– on any owned sticker.</div>${body}`;
+}
+
+// ---- verify ----
+function viewVerify(){
+  const list=stk().filter(s=>s.conf==='low'&&!s.verified).sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  let body = list.length? list.map(s=>{const t=teamByCode[s.t];
+    return `<div class="lrow"><img class="fl" src="${flag(t.iso2)}"><span class="code">${s.code}</span>
+      <input class="full" style="flex:1" data-act="vname" data-code="${s.code}" value="${(s.name||'').replace(/"/g,'&quot;')}">
+      <label style="font-size:12px;color:var(--muted)"><input type="checkbox" class="check" data-act="vown" data-code="${s.code}" ${s.owned?'checked':''}> owned</label>
+      <button class="btn primary" data-act="vok" data-code="${s.code}">Looks right</button></div>`;
+  }).join('') : `<div class="empty">Nothing to verify — all clear!</div>`;
+  return `<h2>To verify <span style="color:var(--muted);font-size:14px">(${list.length})</span></h2>
+    <div class="hint">These were auto-detected with low confidence. Fix the name or owned state if wrong, then hit “Looks right” to clear it.</div>${body}`;
+}
+
+// ---- search ----
+function viewSearch(){
+  const q=(window.__q||'').toLowerCase().trim();
+  let res=[];
+  if(q) res=stk().filter(s=> (s.name||'').toLowerCase().includes(q) || s.code.toLowerCase().includes(q)
+      || teamByCode[s.t].name.toLowerCase().includes(q)).slice(0,200);
+  let body= q? (res.length? res.map(s=>{const t=teamByCode[s.t];
+      return `<div class="lrow"><img class="fl" src="${flag(t.iso2)}"><span class="code">${s.code}</span>
+        <span class="nm">${s.name||''}</span><span class="tm">${t.name}</span>
+        <input type="checkbox" class="check" data-code="${s.code}" ${s.owned?'checked':''}></div>`;}).join('')
+      : `<div class="empty">No matches for “${q}”.</div>`)
+    : `<div class="empty">Search by player name, sticker code (e.g. ARG 17), or team.</div>`;
+  return `<h2>Search</h2><div class="toolbar"><input type="text" id="searchBox" placeholder="Player, code or team…" value="${(window.__q||'').replace(/"/g,'&quot;')}"></div>${body}`;
+}
+
+// ---- matches ----
+function fmtDate(d){ if(!d) return ''; const dt=new Date(d+'T00:00:00'); if(isNaN(dt)) return d;
+  return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
+function mrow(m){
+  const h=teamByCode[m.home], a=teamByCode[m.away];
+  const played=(m.hs!==''&&m.hs!=null)||(m.as!==''&&m.as!=null);
+  const meta=`${m.group?('Group '+m.group):(m.stage||'Custom')}${m.matchday?(' · MD'+m.matchday):''}${m.date?(' · '+fmtDate(m.date)):''}${played?'':' <span class="upc">upcoming</span>'}`;
+  return `<div class="mrow">
+    <div class="side"><img class="fl" src="${flag(h?h.iso2:'')}"><b>${h?h.name:m.home}</b></div>
+    <input class="sc" data-mid="${m.id}" data-f="hs" value="${m.hs??''}" inputmode="numeric" placeholder="–">
+    <span style="color:var(--muted)">-</span>
+    <input class="sc" data-mid="${m.id}" data-f="as" value="${m.as??''}" inputmode="numeric" placeholder="–">
+    <div class="side away"><img class="fl" src="${flag(a?a.iso2:'')}"><b>${a?a.name:m.away}</b></div>
+    <button class="btn" data-delm="${m.id}" title="remove">✕</button>
+    <div class="meta">${meta}</div>
+  </div>`;
+}
+function teamGridCells(){
+  return D.teams.slice().filter(t=>!t.special).sort((a,b)=>a.name.localeCompare(b.name)).map(t=>
+    `<div class="fgcell ${window.__mhome===t.code?'home':''}" data-fg="${t.code}">
+       <img src="${flag(t.iso2)}"><span>${t.name}</span></div>`).join('');
+}
+function viewMatches(){
+  const view=window.__mview||'cal';
+  const ms=S.matches.slice();
+  let body;
+  if(!ms.length){ body=`<div class="empty">No matches yet. Use “+ New match” to add one, or “Reload schedule” to load the World Cup fixtures.</div>`; }
+  else if(view==='grp'){
+    body=GROUPS.map(g=>{
+      const gm=ms.filter(m=>m.group===g).sort((a,b)=>(a.matchday||0)-(b.matchday||0)||(a.date||'').localeCompare(b.date||''));
+      if(!gm.length) return '';
+      let out=`<div class="grphdr">Group ${g}</div>`, md=null;
+      gm.forEach(m=>{ if(m.matchday&&m.matchday!==md){md=m.matchday; out+=`<div class="mdhdr">Matchday ${md}</div>`;} out+=mrow(m); });
+      return out;
+    }).join('');
+    const custom=ms.filter(m=>!m.group);
+    if(custom.length) body+=`<div class="grphdr">Custom matches</div>`+custom.map(mrow).join('');
+  } else {
+    const sorted=ms.slice().sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999')||(a.group||'').localeCompare(b.group||''));
+    let cd=null; body='';
+    sorted.forEach(m=>{ const d=m.date||''; if(d!==cd){cd=d; body+=`<div class="datehdr">${d?fmtDate(d):'No date'}</div>`;} body+=mrow(m); });
+  }
+  return `<h2>Matches</h2>
+    <div class="mhead">
+      <div class="vtoggle">
+        <button data-mv="cal" class="${view==='cal'?'on':''}">Calendar</button>
+        <button data-mv="grp" class="${view==='grp'?'on':''}">By group</button>
+      </div>
+      <button class="btn" id="newMatchBtn">+ New match</button>
+      <div style="flex:1"></div>
+      <button class="btn" id="reloadSched" title="Load/refresh the official World Cup fixtures">Reload schedule</button>
+    </div>
+    ${window.__mgrid?`<div class="fgpick">Tap a team for <b style="color:var(--green)">home</b>, then a team for away to create the match.</div><div class="flaggrid">${teamGridCells()}</div>`:''}
+    ${body}`;
+}
+
+// ---- specials modal ----
+function renderModal(){
+  var m=document.getElementById('modal'); if(!m) return;
+  if(!window.__specEdit){ m.innerHTML=''; return; }
+  var code=window.__specEdit, sObj=D.stickers.find(x=>x.code===code)||{}, nm=nameOf(code,sObj.name)||code, sp=specOf(code);
+  var chips=TIERS.map(T=>`<button class="tierchip ${sp.indexOf(T.key)>=0?'on':''}" data-spec="${T.key}">
+    <span class="sw" style="background:${T.color}"></span><span>${T.label}</span><small>${oddsOf(T.key)}</small></button>`).join('');
+  m.innerHTML=`<div class="mback" data-close="1"><div class="mcard">
+    <div class="mch"><b>${code}</b> · ${nm}<button class="btn" data-close="1">Done</button></div>
+    <div class="mcs">Tap the border colours you own (parallels):</div>
+    <div class="tierchips">${chips}</div></div></div>`;
+}
+
+// ---- specials tab ----
+function viewSpecials(){
+  var totals={}; TIERS.forEach(T=>totals[T.key]=0); var owned=[];
+  D.stickers.forEach(s=>{ var a=specOf(s.code); if(a.length){owned.push(s); a.forEach(k=>totals[k]=(totals[k]||0)+1);} });
+  var legend=TIERS.map(T=>`<div class="trow">
+    <span class="sw" style="background:${T.color}"></span><span class="tl">${T.label}</span>
+    <input class="oddsin" data-odds="${T.key}" value="${oddsOf(T.key)}" title="odds (editable)">
+    <span class="tct">${totals[T.key]||0}</span></div>`).join('');
+  owned.sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  var tot=owned.reduce((n,s)=>n+specOf(s.code).length,0);
+  var countChips=TIERS.map(T=>`<span class="tcchip"><i style="background:${T.color}"></i>${T.label}<b>${totals[T.key]||0}</b></span>`).join('');
+  var list=owned.length? owned.map(s=>{ var t=teamByCode[s.t], nm=nameOf(s.code,s.name);
+    var dots=TIERS.filter(T=>specOf(s.code).indexOf(T.key)>=0).map(T=>`<i class="dot" style="background:${T.color}"></i>`).join('');
+    return `<div class="lrow"><img class="fl" src="${flag(t.iso2)}"><span class="code">${s.code}</span><span class="nm">${nm}</span><span class="tm">${t.name}</span><span class="sdots">${dots}</span><button class="btn" data-specopen="${s.code}">edit</button></div>`;
+  }).join('') : `<div class="empty">No parallels yet. On a team page, tap ✦ on a sticker to record the border colours you own.</div>`;
+  return `<h2>Specials <span style="color:var(--muted);font-size:14px">(${tot})</span></h2>
+    <div class="hint">Parallels are rarer coloured-border versions of a sticker. The odds below are editable. Mark what you own with the ✦ button on each sticker's team page.</div>
+    <div class="tiercounts">${countChips}</div>
+    <div class="legend"><div class="trow trow-h"><span class="sw" style="background:transparent"></span><span class="tl">Tier</span><span class="oddsh">Odds (per pack)</span><span class="tct">Owned</span></div>${legend}</div>
+    <h3 class="grphdr">Your specials</h3>${list}`;
+}
+
+// ---- spending tab ----
+function fmtMoney(n){ return '$'+(Math.round((n||0)*100)/100).toFixed(2); }
+function purchaseLabel(p){ return p.type==='box50'?'Box (50 pkts)':p.type==='box25'?'Box (25 pkts)':p.type==='packet'?'Packet':'Custom'; }
+function viewFinance(){
+  var ps=S.purchases.slice();
+  var totSpend=0,totStk=0,totNew=0;
+  ps.forEach(p=>{ totSpend+=purchaseCost(p); totStk+=purchaseStickers(p); totNew+=(parseInt(p.newCount)||0); });
+  var newPct=totStk?Math.round(totNew/totStk*100):0, cpn=totNew?totSpend/totNew:0;
+  var totDup=Math.max(0,totStk-totNew), dupPct=totStk?Math.round(totDup/totStk*100):0;
+  var byDate={}; ps.forEach(p=>{ var d=p.date||'—'; byDate[d]=(byDate[d]||0)+purchaseCost(p); });
+  var dates=Object.keys(byDate).sort(); var maxSpend=Math.max(1,...dates.map(d=>byDate[d]));
+  var spendBars=dates.length? dates.map(d=>`<div class="bar"><b>${fmtMoney(byDate[d])}</b><i style="height:${Math.round(byDate[d]/maxSpend*100)}%"></i><span>${d==='—'?'—':d.slice(5)}</span></div>`).join('') : '<div class="upc">no data yet</div>';
+  var ordered=ps.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  var trend=ordered.length? ordered.map((p,i)=>{ var st=purchaseStickers(p), np=st?Math.round((parseInt(p.newCount)||0)/st*100):0; return `<div class="bar"><b>${np}%</b><i class="grn" style="height:${np}%"></i><span>#${i+1}</span></div>`; }).join('') : '<div class="upc">no data yet</div>';
+  var rows=ps.length? ordered.slice().reverse().map(p=>{ var st=purchaseStickers(p),nw=parseInt(p.newCount)||0,dp=Math.max(0,st-nw),np=st?Math.round(nw/st*100):0;
+    return `<div class="prow" data-editp="${p.id}"><span class="pdate">${p.date||'—'}</span><span class="pwhat">${(parseInt(p.qty)||1)}× ${purchaseLabel(p)} <small>(${st})</small></span><span class="pcost">${fmtMoney(purchaseCost(p))}</span><span class="pnd"><b style="color:var(--green)">${nw}</b> new / <b style="color:var(--red)">${dp}</b> dup · ${np}%</span><button class="btn" data-delp="${p.id}">✕</button></div>`;
+  }).join('') : `<div class="empty">No purchases logged yet — add one above.</div>`;
+  var ed = window.__editP ? S.purchases.find(x=>x.id==window.__editP) : null;
+  var v=(k)=> ed&&ed[k]!=null?(''+ed[k]):'';
+  var typeOpts=[['box50','Box — 50 packets'],['box25','Box — 25 packets'],['packet','Packet (×7)'],['custom','Custom']].map(o=>`<option value="${o[0]}" ${ed&&ed.type===o[0]?'selected':''}>${o[1]}</option>`).join('');
+  return `<h2>Spending</h2>
+    <div class="stat-cards fin">
+      <div class="card"><div class="n">${fmtMoney(totSpend)}</div><div class="l">Total spent</div></div>
+      <div class="card"><div class="n">${totStk}</div><div class="l">Stickers bought</div></div>
+      <div class="card green"><div class="n">${newPct}%</div><div class="l">New (${totNew})</div></div>
+      <div class="card red"><div class="n">${dupPct}%</div><div class="l">Dups (${totDup})</div></div>
+      <div class="card blue"><div class="n">${fmtMoney(cpn)}</div><div class="l">Cost / new</div></div>
+    </div>
+    <div class="finform">
+      <div><label class="fld">Date</label><input class="full" type="date" id="pDate" value="${v('date')}"></div>
+      <div><label class="fld">What you bought</label><select class="full" id="pType">${typeOpts}</select></div>
+      <div><label class="fld">Qty</label><input class="full" id="pQty" inputmode="numeric" value="${ed?v('qty'):'1'}"></div>
+      <div><label class="fld">Price each</label><input class="full" id="pUnit" inputmode="decimal" placeholder="0.00" value="${v('unit')}"></div>
+      <div id="pStkWrap" style="display:${ed&&ed.type==='custom'?'':'none'}"><label class="fld">Sticker count</label><input class="full" id="pStk" inputmode="numeric" value="${v('stickers')}"></div>
+      <div><label class="fld">New stickers found</label><input class="full" id="pNew" inputmode="numeric" placeholder="0" value="${v('newCount')}"></div>
+      <div><label class="fld">&nbsp;</label><button class="btn primary full" id="addP">${ed?'Save changes':'Add purchase'}</button></div>
+      ${ed?`<div><label class="fld">&nbsp;</label><button class="btn full" id="cancelP">Cancel</button></div>`:''}
+    </div>
+    <div class="hint">Enter the price, what you bought and how many were <b>new</b> — duplicates are worked out for you (total − new). Tap a purchase below to edit it.</div>
+    <div class="charts">
+      <div class="chart"><h4>Spend over time</h4><div class="bars">${spendBars}</div></div>
+      <div class="chart"><h4>New % per purchase</h4><div class="bars">${trend}</div></div>
+    </div>
+    <h3 class="grphdr">Purchases</h3>${rows}`;
+}
+
+// ---- printable export (Save as PDF via the browser print dialog) ----
+function esc(s){ return (''+(s||'')).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function printDoc(title, sub, inner){
+  var w=window.open('','_blank');
+  if(!w){ alert('Allow pop-ups for this page, then tap Save as PDF again.'); return; }
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+
+    'body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#111}'+
+    'h1{font-size:18px;margin:0 0 2px}.sub{color:#666;font-size:12px;margin:0 0 14px}'+
+    'table{width:100%;border-collapse:collapse;font-size:13px}'+
+    'th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #ddd}'+
+    'th{background:#f2f2f2}tr:nth-child(even) td{background:#fafafa}'+
+    '@media print{body{margin:8mm}}</style></head><body>'+
+    '<h1>'+esc(title)+'</h1><div class="sub">'+esc(sub)+' · StickerSprint 2026</div>'+inner+
+    '</body></html>');
+  w.document.close(); w.focus(); setTimeout(function(){ try{ w.print(); }catch(e){} }, 350);
+}
+function swapsTable(){
+  var list=stk().filter(s=>s.dup>0).sort((a,b)=>(a.ord||a.t.localeCompare(b.t))||a.n-b.n);
+  list.sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  var total=list.reduce((n,s)=>n+s.dup,0);
+  var rows=list.map(s=>{var t=teamByCode[s.t]; return '<tr><td>'+esc(s.code)+'</td><td>'+esc(s.name)+'</td><td>'+esc(t.name)+'</td><td>x'+s.dup+'</td></tr>';}).join('');
+  return {sub:total+' spare'+(total===1?'':'s')+' across '+list.length+' sticker'+(list.length===1?'':'s'),
+    html:'<table><thead><tr><th>Code</th><th>Player</th><th>Team</th><th>Spares</th></tr></thead><tbody>'+rows+'</tbody></table>'};
+}
+function missingTable(){
+  var fcode=window.__filter||'';
+  var list=stk().filter(s=>!s.owned); if(fcode) list=list.filter(s=>s.t===fcode);
+  list.sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  var rows=list.map(s=>{var t=teamByCode[s.t]; return '<tr><td>'+esc(s.code)+'</td><td>'+esc(s.name)+'</td><td>'+esc(t.name)+'</td></tr>';}).join('');
+  return {sub:list.length+' missing'+(fcode?(' · '+teamByCode[fcode].name):' · whole album'),
+    html:'<table><thead><tr><th>Code</th><th>Player</th><th>Team</th></tr></thead><tbody>'+rows+'</tbody></table>'};
+}
+
+// ---- copy as text ----
+function toast(msg){ var d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(function(){d.remove();},1800); }
+function fallbackCopy(txt){ var ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); try{ document.execCommand('copy'); toast('Copied to clipboard'); }catch(e){ window.prompt('Copy this text:', txt); } ta.remove(); }
+function copyText(txt){ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast('Copied to clipboard');}, function(){fallbackCopy(txt);}); } else { fallbackCopy(txt); } }
+function swapsText(){
+  var list=stk().filter(s=>s.dup>0).sort((a,b)=>a.t.localeCompare(b.t)||a.n-b.n);
+  var total=list.reduce((n,s)=>n+s.dup,0);
+  var lines=list.map(s=>s.code+(s.name?(' '+s.name):'')+' x'+s.dup);
+  return 'StickerSprint 2026 — Swaps ('+total+' spare'+(total===1?'':'s')+')\n'+lines.join('\n');
+}
+function missingText(){
+  var fcode=window.__filter||'';
+  var list=stk().filter(s=>!s.owned); if(fcode) list=list.filter(s=>s.t===fcode);
+  var byTeam={}; list.forEach(s=>{ (byTeam[s.t]=byTeam[s.t]||[]).push(s.n===0?'00':s.n); });
+  var teamsOrdered=D.teams.slice().sort((a,b)=>(a.ord||0)-(b.ord||0)).filter(t=>byTeam[t.code]);
+  var lines=teamsOrdered.map(t=>t.name+': '+byTeam[t.code].join(', '));
+  return 'StickerSprint 2026 — Need ('+list.length+')'+(fcode?(' — '+teamByCode[fcode].name):'')+'\n'+lines.join('\n');
+}
+
+// ---- wiring ----
+function wire(){
+  document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>go(e.dataset.go));
+  document.querySelectorAll('[data-team]').forEach(e=>e.onclick=()=>go('album',e.dataset.team));
+  document.querySelectorAll('[data-go-team]').forEach(e=>e.onclick=()=>go('album',e.dataset.goTeam));
+
+  // album slots
+  document.querySelectorAll('.slot').forEach(el=>{
+    el.addEventListener('click',ev=>{
+      const code=el.dataset.code; const act=ev.target.closest('[data-act]')?.dataset.act;
+      if(act==='dplus'){ setDup(code,dupOf(code)+1); render(); return;}
+      if(act==='dminus'){ setDup(code,dupOf(code)-1); render(); return;}
+      if(act==='edit'){ const cur=S.nm[code]!==undefined?S.nm[code]:(D.stickers.find(s=>s.code===code).name);
+        const v=prompt('Name for '+code, cur||''); if(v!==null){setName(code,v.trim()); render();} return;}
+      if(act==='spec'){ window.__specEdit=code; render(); return;}
+      setOwned(code,!isOwned(code)); render();
+    });
+  });
+
+  // checkboxes (lists/search)
+  document.querySelectorAll('.check[data-code]').forEach(c=>{
+    if(c.dataset.act) return;
+    c.onchange=()=>{ setOwned(c.dataset.code,c.checked); if(cur.view==='missing'){render();} else render(); };
+  });
+
+  // team filter
+  const tf=document.getElementById('teamFilter');
+  if(tf) tf.onchange=()=>{ window.__filter=tf.value; render(); };
+
+  // PDF exports
+  var sp=document.getElementById('swapPdf');
+  if(sp) sp.onclick=()=>{ var d=swapsTable(); printDoc('Swaps — spares to trade', d.sub, d.html); };
+  var lp=document.getElementById('listPdf');
+  if(lp) lp.onclick=()=>{ var d=missingTable(); printDoc('Missing stickers', d.sub, d.html); };
+  var st=document.getElementById('swapTxt');
+  if(st) st.onclick=()=>copyText(swapsText());
+  var lt=document.getElementById('listTxt');
+  if(lt) lt.onclick=()=>copyText(missingText());
+
+  // swaps steppers
+  document.querySelectorAll('[data-act="dplus"],[data-act="dminus"]').forEach(b=>{
+    if(b.closest('.slot')) return;
+    b.onclick=()=>{ const c=b.dataset.code; setDup(c,dupOf(c)+(b.dataset.act==='dplus'?1:-1)); render(); };
+  });
+
+  // verify
+  document.querySelectorAll('[data-act="vok"]').forEach(b=>b.onclick=()=>{
+    const c=b.dataset.code;
+    const nameInp=document.querySelector(`[data-act="vname"][data-code="${c}"]`);
+    if(nameInp) setName(c,nameInp.value.trim());
+    setVerified(c); render();
+  });
+  document.querySelectorAll('[data-act="vown"]').forEach(c=>c.onchange=()=>{ setOwned(c.dataset.code,c.checked); });
+
+  // search
+  const sb=document.getElementById('searchBox');
+  if(sb){ sb.oninput=()=>{ window.__q=sb.value; const pos=sb.selectionStart; render();
+      const n=document.getElementById('searchBox'); if(n){n.focus(); n.setSelectionRange(pos,pos);} }; }
+
+  // matches — view toggle, new-match flag grid, reload schedule
+  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ window.__mview=b.dataset.mv; render(); });
+  const nmb=document.getElementById('newMatchBtn');
+  if(nmb) nmb.onclick=()=>{ window.__mgrid=!window.__mgrid; window.__mhome=null; render(); };
+  const rl=document.getElementById('reloadSched');
+  if(rl) rl.onclick=()=>{ if(confirm('Load the official World Cup schedule? This refreshes the official fixtures and scores; your own custom matches are kept.')){ reseedFixtures(); render(); } };
+  document.querySelectorAll('[data-fg]').forEach(c=>c.onclick=()=>{
+    const code=c.dataset.fg;
+    if(!window.__mhome){ window.__mhome=code; render(); return; }
+    if(code===window.__mhome){ window.__mhome=null; render(); return; }
+    S.matches.push({id:S.mid++,home:window.__mhome,away:code,hs:'',as:'',date:'',stage:'Custom',kind:'custom'});
+    save(); window.__mhome=null; window.__mgrid=false; render();
+  });
+  document.querySelectorAll('.sc[data-mid]').forEach(inp=>inp.onchange=()=>{
+    const m=S.matches.find(x=>x.id==inp.dataset.mid); if(!m) return;
+    m[inp.dataset.f]= inp.value===''?'':Math.max(0,parseInt(inp.value)||0);
+    m.played=(m.hs!==''&&m.hs!=null)||(m.as!==''&&m.as!=null); save();
+  });
+  document.querySelectorAll('[data-delm]').forEach(b=>b.onclick=()=>{
+    S.matches=S.matches.filter(x=>x.id!=b.dataset.delm); save(); render();
+  });
+
+  // specials modal
+  document.querySelectorAll('#modal [data-spec]').forEach(b=>b.onclick=()=>{ toggleSpec(window.__specEdit,b.dataset.spec); render(); });
+  document.querySelectorAll('#modal [data-close]').forEach(b=>b.addEventListener('click',function(e){ if(e.target===this || e.target.getAttribute('data-close')!=null){ window.__specEdit=null; render(); } }));
+  // specials tab
+  document.querySelectorAll('[data-odds]').forEach(inp=>inp.onchange=()=>{ setTierOdds(inp.dataset.odds, inp.value.trim()); });
+  document.querySelectorAll('[data-specopen]').forEach(b=>b.onclick=()=>{ window.__specEdit=b.dataset.specopen; render(); });
+  // finance
+  var pType=document.getElementById('pType');
+  if(pType) pType.onchange=()=>{ var w=document.getElementById('pStkWrap'); if(w) w.style.display = pType.value==='custom'?'':'none'; };
+  var addP=document.getElementById('addP');
+  if(addP) addP.onclick=()=>{
+    var stkEl=document.getElementById('pStk');
+    var fields={ date:document.getElementById('pDate').value, type:document.getElementById('pType').value,
+      qty:document.getElementById('pQty').value||'1', unit:document.getElementById('pUnit').value||'0',
+      stickers:stkEl?stkEl.value:'', newCount:document.getElementById('pNew').value||'0' };
+    if(purchaseStickers(fields)<=0){ alert('Enter a quantity (and a sticker count for Custom).'); return; }
+    if(window.__editP){ var ex=S.purchases.find(x=>x.id==window.__editP); if(ex) Object.assign(ex,fields); window.__editP=null; }
+    else { fields.id=S.pid++; S.purchases.push(fields); }
+    save(); render();
+  };
+  var cancelP=document.getElementById('cancelP'); if(cancelP) cancelP.onclick=()=>{ window.__editP=null; render(); };
+  document.querySelectorAll('[data-editp]').forEach(r=>r.onclick=(e)=>{ if(e.target.closest('[data-delp]')) return; window.__editP=r.dataset.editp; render(); window.scrollTo(0,0); });
+  document.querySelectorAll('[data-delp]').forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); S.purchases=S.purchases.filter(x=>x.id!=b.dataset.delp); if(window.__editP==b.dataset.delp)window.__editP=null; save(); render(); });
+}
+
+// export / import
+document.getElementById('exportBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='stickersprint-backup.json'; a.click();
+};
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const obj=JSON.parse(r.result);
+    S=Object.assign({ov:{},dup:{},nm:{},ver:{},matches:[],mid:1},obj); save();
+    alert('Backup imported.'); go('dash'); }catch(err){ alert('Could not read that file.'); } };
+  r.readAsText(f);
+};
+
+renderTabs(); render();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>

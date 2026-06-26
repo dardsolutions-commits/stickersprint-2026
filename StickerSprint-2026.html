@@ -4,6 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>StickerSprint 2026 — Road to FIFA World Cup</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StickerSprint">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
     --bg:#0b1020; --panel:#141b30; --panel2:#1b2440; --line:#2a3550;
@@ -1028,6 +1034,11 @@ document.getElementById('importFile').onchange=e=>{
 };
 
 renderTabs(); render();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
