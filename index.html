@@ -225,12 +225,14 @@
     .mform{grid-template-columns:1fr}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <header>
   <div class="hbar">
     <div class="logo">Sticker<b>Sprint</b> 2026</div>
     <div class="spacer"></div>
+    <button class="btn" id="syncBtn" title="Sign in to sync across devices">☁ Sync</button>
     <button class="btn" id="exportBtn">Export</button>
     <button class="btn" id="importBtn">Import</button>
     <input type="file" id="importFile" accept="application/json" style="display:none">
@@ -274,7 +276,7 @@ function load(){
   }catch(e){}
   return base;
 }
-function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
+function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); pushToCloud(); }
 function seedFixtures(){
   if(!D.fixtures || !D.fixtures.length || S.seeded) return;
   D.fixtures.forEach(f=>{ S.matches.push({ id:S.mid++, home:f.home, away:f.away,
@@ -854,6 +856,66 @@ document.getElementById('importFile').onchange=e=>{
 };
 
 renderTabs(); render();
+
+// --- Supabase autosync ---
+const SB_URL = 'https://ndgiqtddthvzocxsrnxk.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kZ2lxdGRkdGh2em9jeHNybnhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MDU4NTEsImV4cCI6MjA5ODA4MTg1MX0.nBzkcUmOB9Sq6i1AGAbgI6Zh0yGoDuA6dsbBA-yf3sA';
+let sbClient=null, sbUser=null, sbTimer=null;
+
+function sbInit(){
+  if(typeof supabase==='undefined') return;
+  sbClient = supabase.createClient(SB_URL, SB_KEY);
+  sbClient.auth.onAuthStateChange(async (event, session)=>{
+    sbUser = session?.user || null;
+    renderSyncBtn();
+    if(sbUser) await pullFromCloud();
+  });
+}
+
+async function pushToCloud(){
+  if(!sbClient||!sbUser) return;
+  clearTimeout(sbTimer);
+  sbTimer = setTimeout(async ()=>{
+    await sbClient.from('user_data').upsert({user_id:sbUser.id, data:S, updated_at:new Date().toISOString()});
+  }, 1500);
+}
+
+async function pullFromCloud(){
+  if(!sbClient||!sbUser) return;
+  const {data,error} = await sbClient.from('user_data').select('data').single();
+  if(data?.data){
+    S = Object.assign({ov:{},dup:{},nm:{},ver:{},matches:[],mid:1,purchases:[],pid:1,spec:{},tierOdds:{},seeded:false}, data.data);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(S));
+    render();
+  }
+}
+
+function renderSyncBtn(){
+  const btn=document.getElementById('syncBtn'); if(!btn) return;
+  if(sbUser){
+    const initial = (sbUser.email||'?')[0].toUpperCase();
+    btn.textContent='☁ '+initial;
+    btn.style.cssText='background:var(--green);color:#fff;border-color:var(--green)';
+    btn.title='Synced as '+sbUser.email+' — click to sign out';
+  } else {
+    btn.textContent='☁ Sync'; btn.style.cssText=''; btn.title='Sign in to sync across devices';
+  }
+}
+
+document.getElementById('syncBtn').onclick=async ()=>{
+  if(!sbClient){ alert('Sync unavailable — check internet connection.'); return; }
+  if(sbUser){
+    if(confirm('Sign out of cloud sync?')){ await sbClient.auth.signOut(); }
+  } else {
+    const email=prompt('Enter your email to sign in:');
+    if(!email) return;
+    const {error}=await sbClient.auth.signInWithOtp({email, options:{emailRedirectTo:location.href}});
+    if(error) alert('Error: '+error.message);
+    else alert('Check your email for a magic sign-in link!');
+  }
+};
+
+sbInit();
 </script>
 <script>
 if('serviceWorker' in navigator){
